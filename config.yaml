@@ -5,8 +5,8 @@ database:
     # staging key will first look at OS environment variables, then here.
     # If empty, will be prompted (like Empire <3.7).
     staging-key: RANDOM
-    username: empireadmin
-    password: password123
+    username: necro
+    password: cox228cox
     obfuscate: false
     # Note the escaped backslashes
     obfuscate-command: "Token\\All\\1"
